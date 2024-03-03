@@ -7,12 +7,10 @@ describe('mb-pnregistry-list', () => {
       components: [MbPnregistryList],
       html: `<mb-pnregistry-list></mb-pnregistry-list>`,
     });
-    expect(page.root).toEqualHtml(`
-      <mb-pnregistry-list>
-        <mock:shadow-root>
-          <slot></slot>
-        </mock:shadow-root>
-      </mb-pnregistry-list>
-    `);
+    const wlList = page.rootInstance as MbPnregistryList;
+    const expectedPatients = wlList?.waitingPatients?.length;
+
+    const items = page.root.shadowRoot.querySelectorAll('md-list-item');
+    expect(items.length).toEqual(expectedPatients);
   });
 });
