@@ -4,6 +4,7 @@ FROM node:latest AS build
 RUN mkdir /build
 WORKDIR /build
 
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 COPY package.json .
 RUN npm install
 
