@@ -49,7 +49,7 @@ export class MbPnregistryList {
   render() {
     return (
       <Host>
-        <h3>Evidenčný systém PN</h3>
+        <h3>Evidenčný systém PN Azure</h3>
         <md-divider></md-divider>
         <md-tabs>
           <md-secondary-tab>
