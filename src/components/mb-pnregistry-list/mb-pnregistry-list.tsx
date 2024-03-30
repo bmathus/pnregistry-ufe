@@ -17,7 +17,7 @@ export class MbPnregistryList {
   private async getPnListAsync() {
     return await Promise.resolve([
       {
-        name: 'Jožko Púčik',
+        name: 'Matúš Bojko',
         patientId: '10001',
         since: new Date(Date.now() - 3 * 86400000),
         condition: 'Kontrola',
