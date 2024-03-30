@@ -1,4 +1,4 @@
-import { Component, Host, h } from '@stencil/core';
+import { Component, Host, h, State } from '@stencil/core';
 
 @Component({
   tag: 'mb-pnregistry-list',
@@ -6,6 +6,8 @@ import { Component, Host, h } from '@stencil/core';
   shadow: true,
 })
 export class MbPnregistryList {
+  @State() selectedChip: string = 'all'; // Default selected chip
+
   waitingPatients: any[];
 
   async componentWillLoad() {
@@ -17,60 +19,54 @@ export class MbPnregistryList {
       {
         name: 'Jožko Púčik',
         patientId: '10001',
-        since: new Date(Date.now() - 10 * 60).toISOString(),
-        estimatedStart: new Date(Date.now() + 65 * 60).toISOString(),
-        estimatedDurationMinutes: 15,
+        since: new Date(Date.now() - 3 * 86400000),
         condition: 'Kontrola',
       },
       {
         name: 'Bc. August Cézar',
         patientId: '10096',
-        since: new Date(Date.now() - 30 * 60).toISOString(),
-        estimatedStart: new Date(Date.now() + 30 * 60).toISOString(),
-        estimatedDurationMinutes: 20,
+        since: new Date(Date.now() - 5 * 86400000),
         condition: 'Teploty',
       },
       {
         name: 'Ing. Ferdinand Trety',
         patientId: '10028',
-        since: new Date(Date.now() - 72 * 60).toISOString(),
-        estimatedStart: new Date(Date.now() + 5 * 60).toISOString(),
-        estimatedDurationMinutes: 15,
+        since: new Date(Date.now() - 10 * 86400000),
         condition: 'Bolesti hrdla',
       },
     ]);
   }
 
-  private isoDateToLocale(iso: string) {
-    if (!iso) return '';
-    return new Date(Date.parse(iso)).toLocaleTimeString();
+  private chipClicked(chipLabel: string) {
+    this.selectedChip = chipLabel;
   }
 
   render() {
     return (
       <Host>
-        <h3>Evidenčný systém PN Azure</h3>
+        <h2>Evidenčný systém PN</h2>
         <md-divider></md-divider>
-        <md-tabs>
-          <md-secondary-tab>
-            <md-icon slot="icon">flight</md-icon>
-            Aktívne
-          </md-secondary-tab>
-          <md-secondary-tab>
-            <md-icon slot="icon">hotel</md-icon>
-            Neaktívne
-          </md-secondary-tab>
-          <md-secondary-tab>
-            <md-icon slot="icon">hiking</md-icon>
-            Všetky
-          </md-secondary-tab>
-        </md-tabs>
+        <div class="list-header">
+          <md-chip-set>
+            <md-filter-chip class="filter-chips-item" label="Všetky" onClick={() => this.chipClicked('all')} selected={this.selectedChip === 'all'}></md-filter-chip>
+            <md-filter-chip class="filter-chips-item" label="Aktívne" onClick={() => this.chipClicked('active')} selected={this.selectedChip === 'active'}></md-filter-chip>
+            <md-filter-chip class="filter-chips-item" label="Neaktívne" onClick={() => this.chipClicked('inactive')} selected={this.selectedChip === 'inactive'}></md-filter-chip>
+          </md-chip-set>
+          <md-filled-tonal-button class="add-pn-button">
+            <md-icon slot="icon">add</md-icon>
+            Pridať PN
+          </md-filled-tonal-button>
+        </div>
+
         <md-list>
           {this.waitingPatients.map(patient => (
-            <md-list-item>
+            <md-list-item type="button">
               <div slot="headline">{patient.name}</div>
-              <div slot="supporting-text">{'Predpokladaný vstup: ' + this.isoDateToLocale(patient.estimatedStart)}</div>
-              <md-icon slot="start">person</md-icon>
+              <div slot="supporting-text">
+                <p class="item">{'Začiatok: ' + patient.since.toLocaleDateString('sk-SK')}</p>
+              </div>
+              <md-icon slot="start">sick</md-icon>
+              <md-icon slot="end">navigate_next</md-icon>
             </md-list-item>
           ))}
         </md-list>

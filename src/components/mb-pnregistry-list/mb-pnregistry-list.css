@@ -1,7 +1,8 @@
 :host {
   display: block;
+  margin: 1.5rem;
+
   /* Blue Grey palette */
-    
   --md-sys-color-primary: var(--md-sys-color-primary-light);
     --md-sys-color-on-primary: var(--md-sys-color-on-primary-light);
     --md-sys-color-primary-container: var(--md-sys-color-primary-container-light);
@@ -63,9 +64,31 @@
     --md-sys-color-surface-tint-light: #006782;
     --md-sys-color-outline-variant-light: #c0c8cc;
     --md-sys-color-scrim-light: #000000;
+}
 
-    
-    
+.list-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  
+}
+
+.filter-chips-item {
+  margin-top: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.add-pn-button {
+  --md-filled-tonal-button-container-shape: 10px;
+  padding: 10px;
+ 
+}
+
+.item {
+  margin: 0;
+  padding: 0;
 }
 
 
