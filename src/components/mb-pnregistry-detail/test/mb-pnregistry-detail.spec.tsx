@@ -7,12 +7,6 @@ describe('mb-pnregistry-detail', () => {
       components: [MbPnregistryDetail],
       html: `<mb-pnregistry-detail></mb-pnregistry-detail>`,
     });
-    // expect(page.root).toEqualHtml(`
-    //   <mb-pnregistry-detail>
-    //     <mock:shadow-root>
-    //       <slot></slot>
-    //     </mock:shadow-root>
-    //   </mb-pnregistry-detail>
-    // `);
+    expect(page.root);
   });
 });

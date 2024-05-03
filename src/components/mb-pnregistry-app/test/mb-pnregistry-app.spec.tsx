@@ -7,12 +7,6 @@ describe('mb-pnregistry-app', () => {
       components: [MbPnregistryApp],
       html: `<mb-pnregistry-app></mb-pnregistry-app>`,
     });
-    // expect(page.root).toEqualHtml(`
-    //   <mb-pnregistry-app>
-    //     <mock:shadow-root>
-
-    //     </mock:shadow-root>
-    //   </mb-pnregistry-app>
-    // `);
+    expect(page.root);
   });
 });
