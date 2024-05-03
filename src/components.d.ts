@@ -6,10 +6,27 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface MbPnregistryApp {
+        "basePath": string;
+    }
+    interface MbPnregistryDetail {
+    }
     interface MbPnregistryList {
     }
 }
 declare global {
+    interface HTMLMbPnregistryAppElement extends Components.MbPnregistryApp, HTMLStencilElement {
+    }
+    var HTMLMbPnregistryAppElement: {
+        prototype: HTMLMbPnregistryAppElement;
+        new (): HTMLMbPnregistryAppElement;
+    };
+    interface HTMLMbPnregistryDetailElement extends Components.MbPnregistryDetail, HTMLStencilElement {
+    }
+    var HTMLMbPnregistryDetailElement: {
+        prototype: HTMLMbPnregistryDetailElement;
+        new (): HTMLMbPnregistryDetailElement;
+    };
     interface HTMLMbPnregistryListElement extends Components.MbPnregistryList, HTMLStencilElement {
     }
     var HTMLMbPnregistryListElement: {
@@ -17,13 +34,22 @@ declare global {
         new (): HTMLMbPnregistryListElement;
     };
     interface HTMLElementTagNameMap {
+        "mb-pnregistry-app": HTMLMbPnregistryAppElement;
+        "mb-pnregistry-detail": HTMLMbPnregistryDetailElement;
         "mb-pnregistry-list": HTMLMbPnregistryListElement;
     }
 }
 declare namespace LocalJSX {
+    interface MbPnregistryApp {
+        "basePath"?: string;
+    }
+    interface MbPnregistryDetail {
+    }
     interface MbPnregistryList {
     }
     interface IntrinsicElements {
+        "mb-pnregistry-app": MbPnregistryApp;
+        "mb-pnregistry-detail": MbPnregistryDetail;
         "mb-pnregistry-list": MbPnregistryList;
     }
 }
@@ -31,6 +57,8 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "mb-pnregistry-app": LocalJSX.MbPnregistryApp & JSXBase.HTMLAttributes<HTMLMbPnregistryAppElement>;
+            "mb-pnregistry-detail": LocalJSX.MbPnregistryDetail & JSXBase.HTMLAttributes<HTMLMbPnregistryDetailElement>;
             "mb-pnregistry-list": LocalJSX.MbPnregistryList & JSXBase.HTMLAttributes<HTMLMbPnregistryListElement>;
         }
     }
