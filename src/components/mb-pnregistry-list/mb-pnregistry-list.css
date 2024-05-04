@@ -1,15 +1,36 @@
 :host {
-  display: block;
+  display: block; 
+  align-self: center;
+  text-align: center;
   width: 100%;
 }
 
-/* List header */
+.empty-list-info {
+  display: inline-block;
+  text-align: center;
+  border: 1px solid #d1d1d1;
+  margin: auto;
+  margin-top: 1.5rem;
+  padding: 20px;
+  border-radius: 10px;
+}
 
+.empty-list-info h4{
+  color: #505050;
+  margin: 0;
+  margin-top: 10px;
+}
+.empty-list-info .icon {
+  color: #505050;
+}
+
+
+/* List header */
 .list-header {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between
+  justify-content: space-between;
 }
 
 .list-header .add-button {
@@ -20,11 +41,18 @@
   margin-left: 0.5rem;
 }
 
+.patient-item {
+  text-align: left;
+}
 
 /* List */
 .patient-item p{
   margin: 0;
   padding: 0;
+}
+
+.pn-item {
+  text-align: left;
 }
 
 .pn-item p {

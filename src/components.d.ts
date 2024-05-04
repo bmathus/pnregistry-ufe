@@ -10,9 +10,18 @@ export namespace Components {
         "basePath": string;
     }
     interface MbPnregistryDetail {
+        "recordId": string;
     }
     interface MbPnregistryList {
     }
+}
+export interface MbPnregistryDetailCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMbPnregistryDetailElement;
+}
+export interface MbPnregistryListCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMbPnregistryListElement;
 }
 declare global {
     interface HTMLMbPnregistryAppElement extends Components.MbPnregistryApp, HTMLStencilElement {
@@ -21,13 +30,35 @@ declare global {
         prototype: HTMLMbPnregistryAppElement;
         new (): HTMLMbPnregistryAppElement;
     };
+    interface HTMLMbPnregistryDetailElementEventMap {
+        "detail-closed": string;
+    }
     interface HTMLMbPnregistryDetailElement extends Components.MbPnregistryDetail, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMbPnregistryDetailElementEventMap>(type: K, listener: (this: HTMLMbPnregistryDetailElement, ev: MbPnregistryDetailCustomEvent<HTMLMbPnregistryDetailElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMbPnregistryDetailElementEventMap>(type: K, listener: (this: HTMLMbPnregistryDetailElement, ev: MbPnregistryDetailCustomEvent<HTMLMbPnregistryDetailElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLMbPnregistryDetailElement: {
         prototype: HTMLMbPnregistryDetailElement;
         new (): HTMLMbPnregistryDetailElement;
     };
+    interface HTMLMbPnregistryListElementEventMap {
+        "record-clicked": string;
+    }
     interface HTMLMbPnregistryListElement extends Components.MbPnregistryList, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMbPnregistryListElementEventMap>(type: K, listener: (this: HTMLMbPnregistryListElement, ev: MbPnregistryListCustomEvent<HTMLMbPnregistryListElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMbPnregistryListElementEventMap>(type: K, listener: (this: HTMLMbPnregistryListElement, ev: MbPnregistryListCustomEvent<HTMLMbPnregistryListElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLMbPnregistryListElement: {
         prototype: HTMLMbPnregistryListElement;
@@ -44,8 +75,11 @@ declare namespace LocalJSX {
         "basePath"?: string;
     }
     interface MbPnregistryDetail {
+        "onDetail-closed"?: (event: MbPnregistryDetailCustomEvent<string>) => void;
+        "recordId"?: string;
     }
     interface MbPnregistryList {
+        "onRecord-clicked"?: (event: MbPnregistryListCustomEvent<string>) => void;
     }
     interface IntrinsicElements {
         "mb-pnregistry-app": MbPnregistryApp;

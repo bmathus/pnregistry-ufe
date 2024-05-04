@@ -1,6 +1,6 @@
 :host {
   display: block;
- 
+  align-self: center;
 }
 
 .horizontal-box {
@@ -8,7 +8,7 @@
   flex-direction: row;
   gap: 1.5rem;
   border: 1px solid #d1d1d1;
-  margin: 1.5rem;
+  margin-top: 1.5rem;
   padding: 1.5rem;
   border-radius: 12px;
 }
@@ -35,7 +35,7 @@
   align-items: flex-start;
 }
 
-.vertical-box .button {
+.button {
   --md-filled-tonal-button-container-shape: 10px;
   --md-outlined-button-container-shape: 10px
 }
@@ -67,7 +67,17 @@
   --md-menu-container-color: #eff1f3;
 }
 
+/* delete dialog */
+.dialog {
+  --md-dialog-container-shape: 10px;
+  --md-dialog-container-color:#eff1f3;
+}
 
+/* loading */
+.loading {
+  margin-right: 10px;
+  margin-left: 10px;
+}
 
 
 

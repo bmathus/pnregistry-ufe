@@ -40,12 +40,12 @@ export class MbPnregistryApp {
 
   render() {
     let element = 'list';
-    let entryId = '@new';
+    let recordId = '@new';
 
-    if (this.relativePath.startsWith('entry/')) {
-      element = 'editor';
-      entryId = this.relativePath.split('/')[1];
-      console.log('Entry id:', entryId);
+    if (this.relativePath.startsWith('record/')) {
+      element = 'detail';
+      recordId = this.relativePath.split('/')[1];
+      console.log('Record id:', recordId);
     }
 
     const navigate = (path: string) => {
@@ -58,10 +58,10 @@ export class MbPnregistryApp {
         <h2>Evidenčný systém PN</h2>
         <md-divider></md-divider>
         <div class="app-content">
-          {element === 'editor' ? (
-            <mb-pnregistry-detail entry-id={entryId} oneditor-closed={() => navigate('./list')}></mb-pnregistry-detail>
+          {element === 'detail' ? (
+            <mb-pnregistry-detail record-id={recordId} onDetail-closed={() => navigate('./list')}></mb-pnregistry-detail>
           ) : (
-            <mb-pnregistry-list></mb-pnregistry-list>
+            <mb-pnregistry-list onRecord-clicked={(ev: CustomEvent<string>) => navigate('./record/' + ev.detail)}></mb-pnregistry-list>
           )}
         </div>
       </Host>

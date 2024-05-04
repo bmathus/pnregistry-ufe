@@ -12,6 +12,8 @@ import '@material/web/textfield/filled-text-field.js';
 import '@material/web/select/outlined-select';
 import '@material/web/select/select-option';
 import '@material/web/checkbox/checkbox';
+import '@material/web/dialog/dialog';
+import '@material/web/progress/linear-progress';
 
 import { registerNavigationApi } from './navigation.js';
 

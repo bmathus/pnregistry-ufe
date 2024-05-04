@@ -1,4 +1,4 @@
-import { Component, Host, h } from '@stencil/core';
+import { Component, Host, h, Prop, EventEmitter, Event, State } from '@stencil/core';
 
 @Component({
   tag: 'mb-pnregistry-detail',
@@ -6,6 +6,36 @@ import { Component, Host, h } from '@stencil/core';
   shadow: true,
 })
 export class MbPnregistryDetail {
+  @Prop() recordId: string;
+
+  @Event({ eventName: 'detail-closed' }) detailClosed: EventEmitter<string>;
+  @State() isDialogOpen: boolean = false; // Track the state of the dialog
+  @State() loading: boolean = true;
+
+  // Function to open the dialog
+  openDialog() {
+    this.isDialogOpen = true;
+  }
+
+  // Function to close the dialog
+  closeDialog() {
+    this.isDialogOpen = false;
+  }
+
+  async componentWillLoad() {
+    this.getPnRecord();
+  }
+
+  private async getPnRecord() {
+    return new Promise((resolve, _) => {
+      setTimeout(() => {
+        // Simulated data response
+        this.loading = false;
+        resolve('cau');
+      }, 2000); // Simulating a delay of 2 seconds
+    });
+  }
+
   render() {
     return (
       <Host>
@@ -20,7 +50,7 @@ export class MbPnregistryDetail {
             </div>
 
             <div class="input-form">
-              <md-outlined-text-field label="Meno a priezvisko" class="input-size">
+              <md-outlined-text-field label="Meno a priezvisko" class="input-size" error error-text="Si had na krku">
                 <md-icon slot="leading-icon">id_card</md-icon>
               </md-outlined-text-field>
 
@@ -44,7 +74,7 @@ export class MbPnregistryDetail {
               </md-outlined-text-field>
             </div>
 
-            <md-outlined-button class="button">
+            <md-outlined-button class="button" onClick={() => this.openDialog()}>
               <md-icon slot="icon">delete</md-icon>
               Zmazať
             </md-outlined-button>
@@ -91,7 +121,9 @@ export class MbPnregistryDetail {
             </div>
 
             <div class="save-cancel">
-              <md-outlined-button class="button">Zrušiť</md-outlined-button>
+              <md-outlined-button class="button" onClick={() => this.detailClosed.emit('cancel')}>
+                Zrušiť
+              </md-outlined-button>
               <md-filled-tonal-button class="button save-button">
                 <md-icon slot="icon">save</md-icon>
                 Uložiť
@@ -99,6 +131,25 @@ export class MbPnregistryDetail {
             </div>
           </div>
         </div>
+
+        {this.loading && <md-linear-progress indeterminate class="loading"></md-linear-progress>}
+
+        <md-dialog type="alert" open={this.isDialogOpen} class="dialog">
+          <div slot="headline">Potvrdenie zmazania</div>
+          <form slot="content" id="form-id" method="dialog">
+            <div>Naozaj si prajete zmazať záznam o PN?</div>
+            <div> Akcia nieje navrátitelná</div>
+          </form>
+          <div slot="actions">
+            <md-outlined-button class="button" form="form-id" value="cancel" onClick={() => this.closeDialog()}>
+              Zrušiť
+            </md-outlined-button>
+            <md-outlined-button class="button" form="form-id" value="delete" onClick={() => this.closeDialog()}>
+              <md-icon slot="icon">delete</md-icon>
+              Zmazať
+            </md-outlined-button>
+          </div>
+        </md-dialog>
       </Host>
     );
   }
