@@ -7,12 +7,15 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface MbPnregistryApp {
+        "apiBase": string;
         "basePath": string;
     }
     interface MbPnregistryDetail {
+        "apiBase": string;
         "recordId": string;
     }
     interface MbPnregistryList {
+        "apiBase": string;
     }
 }
 export interface MbPnregistryDetailCustomEvent<T> extends CustomEvent<T> {
@@ -72,13 +75,16 @@ declare global {
 }
 declare namespace LocalJSX {
     interface MbPnregistryApp {
+        "apiBase"?: string;
         "basePath"?: string;
     }
     interface MbPnregistryDetail {
+        "apiBase"?: string;
         "onDetail-closed"?: (event: MbPnregistryDetailCustomEvent<string>) => void;
         "recordId"?: string;
     }
     interface MbPnregistryList {
+        "apiBase"?: string;
         "onRecord-clicked"?: (event: MbPnregistryListCustomEvent<string>) => void;
     }
     interface IntrinsicElements {

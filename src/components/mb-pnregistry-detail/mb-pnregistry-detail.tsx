@@ -1,4 +1,6 @@
 import { Component, Host, h, Prop, EventEmitter, Event, State } from '@stencil/core';
+import { Record } from '../../api/pnregistry';
+import { MdOutlinedField } from '@material/web/field/outlined-field';
 
 @Component({
   tag: 'mb-pnregistry-detail',
@@ -7,36 +9,87 @@ import { Component, Host, h, Prop, EventEmitter, Event, State } from '@stencil/c
 })
 export class MbPnregistryDetail {
   @Prop() recordId: string;
+  @Prop() apiBase: string;
 
   @Event({ eventName: 'detail-closed' }) detailClosed: EventEmitter<string>;
+
+  @State() record: Record;
   @State() isDialogOpen: boolean = false; // Track the state of the dialog
   @State() loading: boolean = true;
+  @State() errorMessage: string;
+  @State() isValid: boolean;
+  @State() newPacient: boolean;
+
+  private formElement: HTMLFormElement;
+  private formSecond: HTMLFormElement;
 
   // Function to open the dialog
-  openDialog() {
+  private openDialog() {
     this.isDialogOpen = true;
   }
 
   // Function to close the dialog
-  closeDialog() {
+  private closeDialog() {
     this.isDialogOpen = false;
   }
 
   async componentWillLoad() {
-    this.getPnRecord();
+    this.getPnRecordAsync();
   }
 
-  private async getPnRecord() {
-    return new Promise((resolve, _) => {
-      setTimeout(() => {
-        // Simulated data response
-        this.loading = false;
-        resolve('cau');
-      }, 2000); // Simulating a delay of 2 seconds
-    });
+  private createEmptyRecord() {
+    this.record = {
+      id: '@new',
+      checkUpDone: false,
+    };
+  }
+
+  private async getPnRecordAsync() {
+    if (this.recordId === '@new') {
+      this.isValid = false;
+      this.createEmptyRecord();
+      return;
+    }
+    if (!this.recordId) {
+      this.isValid = false;
+      return;
+    }
+  }
+
+  private checkFormValidity() {
+    // check validity of elements
+    for (let i = 0; i < this.formElement.children.length; i++) {
+      const element = this.formElement.children[i] as HTMLInputElement;
+      this.checkInputValidity(element);
+    }
+  }
+
+  private checkInputValidity(inputElement: HTMLInputElement) {
+    // Directly check and report validity for the target element
+    let valid = true;
+    this.isValid = true;
+    if ('reportValidity' in inputElement) {
+      inputElement.setCustomValidity('');
+      if (inputElement.validity.valueMissing) {
+        inputElement.setCustomValidity('Pole je povinné');
+      }
+      if (inputElement.validity.patternMismatch) {
+        inputElement.setCustomValidity('Pole može obsahovať len číselné znaky');
+      }
+
+      const valid = inputElement.reportValidity();
+      this.isValid &&= valid;
+    }
+  }
+
+  private handleInputEvent(ev: InputEvent): string {
+    const target = ev.target as HTMLInputElement;
+    this.checkInputValidity(target);
+    return target.value;
   }
 
   render() {
+    console.log('render triggered:', this.record);
     return (
       <Host>
         <div class="horizontal-box">
@@ -45,34 +98,99 @@ export class MbPnregistryDetail {
               <h3>Pacient</h3>
               <div>
                 <label htmlFor="check">Nový:</label>
-                <md-checkbox id="check"></md-checkbox>
+                <md-checkbox
+                  id="check"
+                  checked={this.newPacient}
+                  onChange={(ev: Event) => {
+                    this.record.fullName = '';
+                    this.newPacient = (ev.target as HTMLInputElement).checked;
+                  }}
+                ></md-checkbox>
               </div>
             </div>
 
-            <div class="input-form">
-              <md-outlined-text-field label="Meno a priezvisko" class="input-size" error error-text="Si had na krku">
+            <form ref={el => (this.formElement = el)} class="input-form">
+              <md-outlined-text-field
+                key={this.newPacient}
+                id="fullname"
+                label="Meno a Priezvisko"
+                class="input-size"
+                value={this.record.fullName}
+                disabled={this.newPacient}
+                required
+                oninput={(ev: InputEvent) => {
+                  if (this.record) {
+                    this.record.fullName = this.handleInputEvent(ev);
+
+                    console.log('record po handle:', this.record.fullName);
+                  }
+                }}
+              >
                 <md-icon slot="leading-icon">id_card</md-icon>
               </md-outlined-text-field>
 
-              <md-outlined-text-field type="number" label="Rodné číslo" maxlength="10" class="input-size">
+              <md-outlined-text-field
+                id="pacientid"
+                label="Rodné číslo"
+                class="input-size"
+                type="text"
+                maxlength="10"
+                required
+                pattern="\d*"
+                value={this.record.patientId}
+                oninput={(ev: InputEvent) => {
+                  if (this.record) {
+                    this.record.patientId = this.handleInputEvent(ev);
+                  }
+                }}
+              >
                 <md-icon slot="leading-icon">fingerprint</md-icon>
               </md-outlined-text-field>
 
-              <md-outlined-text-field label="Názov zamestnávateľa" class="input-size">
+              <md-outlined-text-field
+                id="employer"
+                label="Názov zamestnávateľa"
+                class="input-size"
+                required
+                value={this.record.employer}
+                oninput={(ev: InputEvent) => {
+                  if (this.record) {
+                    this.record.employer = this.handleInputEvent(ev);
+                  }
+                }}
+              >
                 <md-icon slot="leading-icon">corporate_fare</md-icon>
               </md-outlined-text-field>
-            </div>
 
-            <h3>Plánovaná kontrola</h3>
-            <div class="input-form">
+              <h3>Plánovaná kontrola</h3>
+
               <div>
                 <label htmlFor="check">Vybavená:</label>
-                <md-checkbox id="check"></md-checkbox>
+                <md-checkbox
+                  id="check"
+                  checked={this.record.checkUpDone}
+                  onChange={(ev: Event) => {
+                    const target = ev.target as HTMLInputElement;
+                    this.record.checkUpDone = target.checked;
+                  }}
+                ></md-checkbox>
               </div>
-              <md-outlined-text-field type="date" label="Dátum kontroly" class="input-size">
+
+              <md-outlined-text-field
+                id="checkup"
+                label="Dátum kontroly"
+                class="input-size"
+                type="date"
+                value={this.record.checkUp}
+                oninput={(ev: InputEvent) => {
+                  if (this.record) {
+                    this.record.checkUp = this.handleInputEvent(ev);
+                  }
+                }}
+              >
                 <md-icon slot="leading-icon">edit_calendar</md-icon>
               </md-outlined-text-field>
-            </div>
+            </form>
 
             <md-outlined-button class="button" onClick={() => this.openDialog()}>
               <md-icon slot="icon">delete</md-icon>
@@ -82,10 +200,15 @@ export class MbPnregistryDetail {
 
           <div class="vertical-box">
             <h3>Detail práceneschopnosti</h3>
-            <div class="input-form">
-              <md-outlined-text-field label="PN ID">
+            <form ref={el => (this.formSecond = el)} class="input-form">
+              <md-outlined-text-field label="PN ID" value={this.record.id} class="input-size" disabled>
                 <md-icon slot="leading-icon">fingerprint</md-icon>
               </md-outlined-text-field>
+
+              <md-outlined-text-field type="datetime-local" label="Dátum a čas vzniku PN" value={this.record.issued} class="input-size">
+                <md-icon slot="leading-icon">calendar_month</md-icon>
+              </md-outlined-text-field>
+
               <md-outlined-select label="Dôvod">
                 <md-icon slot="leading-icon">sick</md-icon>
                 <md-select-option selected value="choroba">
@@ -107,24 +230,32 @@ export class MbPnregistryDetail {
                   <div>iné</div>
                 </md-select-option>
               </md-outlined-select>
-              <md-outlined-text-field type="date" label="Dátum vzniku PN" disabled class="input-size">
-                <md-icon slot="leading-icon">fingerprint</md-icon>
-              </md-outlined-text-field>
 
-              <md-outlined-text-field type="date" label="Začiatok platnosti" class="input-size">
+              <md-outlined-text-field
+                type="date"
+                label="Začiatok platnosti"
+                class="input-size"
+                value={this.record.validFrom}
+                oninput={(ev: InputEvent) => {
+                  if (this.record) {
+                    const target = ev.target as HTMLInputElement;
+                    this.record.validFrom = target.value;
+                  }
+                }}
+              >
                 <md-icon slot="leading-icon">calendar_month</md-icon>
               </md-outlined-text-field>
 
               <md-outlined-text-field type="date" label="Predpokladané trvanie do" class="input-size">
                 <md-icon slot="leading-icon">calendar_month</md-icon>
               </md-outlined-text-field>
-            </div>
+            </form>
 
             <div class="save-cancel">
               <md-outlined-button class="button" onClick={() => this.detailClosed.emit('cancel')}>
                 Zrušiť
               </md-outlined-button>
-              <md-filled-tonal-button class="button save-button">
+              <md-filled-tonal-button class="button save-button" onClick={() => console.log(this.record)}>
                 <md-icon slot="icon">save</md-icon>
                 Uložiť
               </md-filled-tonal-button>

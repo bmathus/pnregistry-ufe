@@ -14,6 +14,7 @@ declare global {
 export class MbPnregistryApp {
   @State() private relativePath = '';
   @Prop() basePath: string = '';
+  @Prop() apiBase: string;
 
   componentWillLoad() {
     const baseUri = new URL(this.basePath, document.baseURI || '/').pathname;
@@ -61,7 +62,7 @@ export class MbPnregistryApp {
           {element === 'detail' ? (
             <mb-pnregistry-detail record-id={recordId} onDetail-closed={() => navigate('./list')}></mb-pnregistry-detail>
           ) : (
-            <mb-pnregistry-list onRecord-clicked={(ev: CustomEvent<string>) => navigate('./record/' + ev.detail)}></mb-pnregistry-list>
+            <mb-pnregistry-list api-base={this.apiBase} onRecord-clicked={(ev: CustomEvent<string>) => navigate('./record/' + ev.detail)}></mb-pnregistry-list>
           )}
         </div>
       </Host>

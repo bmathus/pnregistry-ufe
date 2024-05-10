@@ -8,7 +8,7 @@ describe('mb-pnregistry-list', () => {
       html: `<mb-pnregistry-list></mb-pnregistry-list>`,
     });
     const pnRegistryList = page.rootInstance as MbPnregistryList;
-    const pacientList = Array.from(pnRegistryList?.pnListByPatient);
+    const pacientList = Array.from(pnRegistryList?.pnRecordsByPatient);
 
     const items = page.root.shadowRoot.querySelectorAll('md-list-item');
     expect(items.length).toEqual(pacientList.length);

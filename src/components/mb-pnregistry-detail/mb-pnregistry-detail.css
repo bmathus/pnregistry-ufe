@@ -24,7 +24,7 @@
 }
 
 .vertical-box h3{
-  margin-bottom: 1rem;
+  margin-bottom: 0rem;
   margin-top: 0rem;
 }
 .vertical-box .pacient-heading {
@@ -51,7 +51,7 @@
 
  /* forms */
 .input-form {
-  --_wl-editor_gap: var(--wl-gap, 1.5rem);
+  --_wl-editor_gap: var(--wl-gap, 1.8rem);
   display: flex;
   flex-direction: column;
   gap: var(--_wl-editor_gap);

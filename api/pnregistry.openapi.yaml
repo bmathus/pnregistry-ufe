@@ -1,0 +1,251 @@
+openapi: 3.0.0
+servers:
+  - description: Cluster Endpoint
+    url: /api
+info:
+  description: Evidence and tracking system of sick-leave (PN) records for Web-In-Cloud system
+  version: '1.0.0'
+  title: PN registry API
+  contact:
+    email: xbojko@stuba.sk
+  license:
+    name: CC BY 4.0
+    url: 'https://creativecommons.org/licenses/by/4.0/'
+tags:
+  - name: PnRegistryRecords
+    description: Sick-leave (PN) records API
+paths:
+  '/records/':
+    get:
+      tags:
+        - PnRegistryRecords
+      summary: Provides list of all PN records
+      operationId: getRecordAll
+      description: Returns a list of all PN records stored in the system
+      responses:
+        '200':
+          description: list of all PN records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Record'
+              examples:
+                response:
+                  $ref: '#/components/examples/RecordsExample'
+    post:
+      tags:
+        - PnRegistryRecords
+      summary: Saves new PN record into list of all PN records
+      operationId: createRecord
+      description: Use this method to store newly issued PN record of pacient into list of all PN records in the system.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Record'
+            examples:
+              request-sample:
+                $ref: '#/components/examples/RecordExample'
+        description: New PN record to store
+        required: true
+      responses:
+        '200':
+          description: >-
+            Newly created PN record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Record'
+              examples:
+                updated-response:
+                  $ref: '#/components/examples/RecordExample'
+  '/records/{recordId}/':
+    get:
+      tags:
+        - PnRegistryRecords
+      summary: Provides details about specific PN record
+      operationId: getRecord
+      description: >-
+        By specifying recordId and entryId you can get details of particular PN record.
+      parameters:
+        - in: path
+          name: recordId
+          description: pass the id of the particular PN record
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: details of required PN record with specified recordId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Record'
+              examples:
+                response:
+                  $ref: '#/components/examples/RecordExample'
+    put:
+      tags:
+        - PnRegistryRecords
+      summary: Updates specific PN record
+      operationId: updateRecord
+      description: Use this method to update content of specific PN record.
+      parameters:
+        - in: path
+          name: recordId
+          description: pass the id of the particular PN record
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Record'
+            examples:
+              request:
+                $ref: '#/components/examples/RecordExample'
+        description: Waiting list entry to update
+        required: true
+      responses:
+        '200':
+          description: >-
+            PN record with updated details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Record'
+              examples:
+                response:
+                  $ref: '#/components/examples/RecordExample'
+    delete:
+      tags:
+        - PnRegistryRecords
+      summary: Deletes specific PN record
+      operationId: deleteRecord
+      description: Use this method to delete the specific PN record from list of all PN record in the system.
+      parameters:
+        - in: path
+          name: recordId
+          description: pass the id of the particular PN record
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Record deleted
+components:
+  schemas:
+    Record:
+      type: object
+      properties:
+        id:
+          type: string
+          example: x321ab3
+          description: Unique identifier of PN record
+        fullName:
+          type: string
+          example: Matúš Bojko
+          description: Full name of pacient whom the PN record was issued
+        patientId:
+          type: string
+          example: '9912105126'
+          description: Unique identifier of the patient - in slovakia its rodné číslo
+        employer:
+          type: string
+          example: Volkswagen Slovakia
+          description: Pacient's employer linked to the issued PN record
+        reason:
+          type: string
+          example: choroba
+          description: Reason/couse why the PN was issued for the pacient
+        issued:
+          type: string
+          format: date-time
+          example: '2038-12-24T10:05:00Z'
+          description: Timestamp when the PN record was created (issued)
+        validFrom:
+          type: string
+          format: date
+          example: '2017-07-21'
+          description: Date since the issued PN record is valid
+        validUntil:
+          type: string
+          format: date
+          example: '2017-08-21'
+          description: Date when the issued PN record validity ends (expires)
+        checkUp:
+          type: string
+          format: date-time
+          example: '2038-12-24T10:40:00Z'
+          description: Timestamp when the check up associated with PN record is planned
+        checkUpDone:
+          type: boolean
+          example: true
+          description: If the check up associated with PN record was done
+  examples:
+    RecordExample:
+      summary: PN record issued for Lubomir Zlostný
+      description: |
+        Record represents a sick-leave (PN) issued for pacient by their doctor
+      value:
+        id: x321ab3
+        fullName: Ľudomír Zlostný
+        patientId: '9912105126'
+        employer: Volkswagen Slovakia
+        reason: choroba
+        issued: '2038-12-24T10:05:00Z'
+        validFrom: '2017-07-21'
+        validUntil: '2017-08-21'
+        checkUp: '2038-12-24T10:40:00Z'
+        checkUpDone: true
+    RecordsExample:
+      summary: List of all PN records in the system
+      description: Example list containing 3 PN records - 1 for patient Matúš and 2 for patient Lucia
+      value:
+        - id: x321ab3
+          fullName: Matúš Bojko
+          patientId: '9912105126'
+          employer: 'ESET, spol. s.r.o'
+          reason: choroba
+          issued: '2023-12-20T10:05:00Z'
+          validFrom: '2024-01-20'
+          validUntil: '2024-06-20'
+          checkUp: '2024-04-12T10:00:00Z'
+          checkUpDone: false
+        - id: c3f1ac9
+          fullName: Lucia Hanuláková
+          patientId: '0155171489'
+          employer: 'Lekáreň Dr.Max'
+          reason: 'pracovný úraz'
+          issued: '2024-02-20T10:05:00Z'
+          validFrom: '2024-02-21'
+          validUntil: '2024-03-21'
+          checkUp: '2024-03-10T10:00:00Z'
+          checkUpDone: true
+        - id: g4f5hc6
+          fullName: Lucia Hanuláková
+          patientId: '0155171489'
+          employer: 'Lekáreň Benu'
+          reason: 'iné'
+          issued: '2024-09-20T10:05:00Z'
+          validFrom: '2024-09-29'
+          validUntil: '2024-10-29'
+          checkUp: '2024-10-19T10:00:00Z'
+          checkUpDone: true
+
+
+
+
+
+
+
+
+
+
+
+
+
+

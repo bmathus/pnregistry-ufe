@@ -1,4 +1,5 @@
-import { Component, Host, h, State, EventEmitter, Event } from '@stencil/core';
+import { Component, Host, h, State, EventEmitter, Event, Prop } from '@stencil/core';
+import { PnRegistryRecordsApiFactory, Record } from '../../api/pnregistry';
 
 @Component({
   tag: 'mb-pnregistry-list',
@@ -6,69 +7,43 @@ import { Component, Host, h, State, EventEmitter, Event } from '@stencil/core';
   shadow: true,
 })
 export class MbPnregistryList {
+  @Prop() apiBase: string;
+
   @Event({ eventName: 'record-clicked' }) recordClicked: EventEmitter<string>;
 
-  @State() expandedPatientId: number | null = null;
+  @State() expandedPatientId: string | null = null;
   @State() loading: boolean = true;
-
-  pnList: any[];
-  @State() pnListByPatient: Map<number, any[]> = new Map();
+  @State() pnRecordsByPatient: Map<string, Record[]> = new Map();
+  @State() errorMessage: string;
 
   async componentWillLoad() {
-    this.getPnListAsync();
+    this.loadPnRecords();
   }
 
-  private async getPnListAsync() {
-    const data = [
-      {
-        id: 1,
-        fullName: 'Matúš Bojko',
-        patientId: 1043232,
-        employer: 'Apple',
-        cause: 'choroba',
-        created: new Date(Date.now() - 2 * 86400000),
-        validFrom: new Date(Date.now() - 2 * 86400000),
-        validUntil: new Date(Date.now() - 3 * 86400000),
-        checkUp: new Date(Date.now() - 3 * 86400000),
-        checkUpDone: true,
-      },
-      {
-        id: 2,
-        fullName: 'Matúš Bojko',
-        patientId: 1043232,
-        employer: 'Apple',
-        cause: 'choroba',
-        created: new Date(Date.now() - 2 * 86400000),
-        validFrom: new Date(Date.now() - 2 * 86400000),
-        validUntil: new Date(Date.now() - 3 * 86400000),
-        checkUp: new Date(Date.now() - 3 * 86400000),
-        checkUpDone: true,
-      },
-      {
-        id: 3,
-        fullName: 'Lucka Bojko',
-        patientId: 10432,
-        employer: 'Apple',
-        cause: 'choroba',
-        created: new Date(Date.now() - 2 * 86400000),
-        validFrom: new Date(Date.now() - 2 * 86400000),
-        validUntil: new Date(Date.now() - 3 * 86400000),
-        checkUp: new Date(Date.now() - 3 * 86400000),
-        checkUpDone: true,
-      },
-    ];
+  private async getPnRecordsAsync() {
+    let responseData = [];
+    try {
+      const response = await PnRegistryRecordsApiFactory(undefined, this.apiBase).getRecordAll();
+      this.loading = false;
+      if (response.status < 299) {
+        responseData = response.data;
+      } else {
+        this.errorMessage = `Cannot retrieve list of PN records: ${response.statusText}`;
+      }
+    } catch (err: any) {
+      this.errorMessage = `Cannot retrieve list of PN records: ${err.message || 'unknown'}`;
+    }
+    this.loading = false;
 
-    return new Promise((resolve, _) => {
-      setTimeout(() => {
-        // Simulated data response
-        this.pnListByPatient = this.groupByPatientId(data);
-        this.loading = false;
-        resolve(data);
-      }, 2000); // Simulating a delay of 2 seconds
-    });
+    return responseData;
   }
 
-  private groupByPatientId(records) {
+  private async loadPnRecords() {
+    const pnRecords = await this.getPnRecordsAsync();
+    this.pnRecordsByPatient = this.groupByPatientId(pnRecords);
+  }
+
+  private groupByPatientId(records: Record[]) {
     const grouped = new Map();
 
     records.forEach(record => {
@@ -90,8 +65,13 @@ export class MbPnregistryList {
     return grouped;
   }
 
-  private toggleExpand(patientId: number) {
+  private toggleExpand(patientId: string) {
     this.expandedPatientId = this.expandedPatientId === patientId ? null : patientId;
+  }
+
+  private isoDateToLocale(iso: string) {
+    if (!iso) return '';
+    return new Date(Date.parse(iso)).toLocaleString('sk-SK');
   }
 
   render() {
@@ -109,11 +89,18 @@ export class MbPnregistryList {
           <md-linear-progress indeterminate></md-linear-progress>
         ) : (
           <div>
-            {this.pnListByPatient.size === 0 ? (
-              <div class="empty-list-info">
-                <md-icon class="icon">info</md-icon>
-                <h4>V systéme niesu žiadné záznami o PN</h4>
-              </div>
+            {this.pnRecordsByPatient.size === 0 ? (
+              this.errorMessage ? (
+                <div class="empty-list-info">
+                  <md-icon class="icon">warning</md-icon>
+                  <h4>{this.errorMessage}</h4>
+                </div>
+              ) : (
+                <div class="empty-list-info">
+                  <md-icon class="icon">info</md-icon>
+                  <h4>V systéme niesu žiadné záznami o PN</h4>
+                </div>
+              )
             ) : (
               this.renderList()
             )}
@@ -126,11 +113,11 @@ export class MbPnregistryList {
   private renderList() {
     return (
       <md-list>
-        {Array.from(this.pnListByPatient.entries()).map(([patientId, records]) => (
+        {Array.from(this.pnRecordsByPatient.entries()).map(([patientId, records]) => (
           <div>
             <md-list-item type="button" class="patient-item" onClick={() => this.toggleExpand(patientId)}>
               <div slot="headline">{records[0].fullName}</div>
-              <div slot="supporting-text">{'Najbližšia kontrola: ' + records[0].checkUp.toLocaleDateString('sk-SK')}</div>
+              <div slot="supporting-text">{'Najbližšia kontrola: ' + this.isoDateToLocale(records[0].checkUp)}</div>
               <md-icon slot="start">fingerprint</md-icon>
               <md-icon slot="end">{this.expandedPatientId === patientId ? 'expand_less' : 'expand_more'}</md-icon>
             </md-list-item>
