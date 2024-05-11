@@ -78,7 +78,7 @@ export class MbPnregistryList {
     return (
       <Host>
         <div class="list-header">
-          <h3 class="title">Zoznam pacientov a ich PN</h3>
+          <h3 class="title">Zoznam PN podla pacientov</h3>
           <md-filled-tonal-button class="add-button" onClick={() => this.recordClicked.emit('@new')}>
             <md-icon slot="icon">add</md-icon>
             Pridať PN
