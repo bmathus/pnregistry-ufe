@@ -71,7 +71,6 @@ export class MbPnregistryDetail {
       const element = formElement.children[i] as HTMLInputElement;
 
       if (element.id === 'checkup') {
-        console.log('vykonam sa');
         valid = this.checkDatesValidity(element, this.record.checkUp, 'Dátum kontroly PN nesmie byť skôr ako začiatok platnosti');
         this.isValid &&= valid;
         continue;
@@ -100,12 +99,10 @@ export class MbPnregistryDetail {
       if (inputElement.validity.badInput) {
         inputElement.setCustomValidity('Zadajte validný dátum');
       }
-
       return inputElement.reportValidity();
     }
     return true;
   }
-  //
 
   private checkDatesValidity(inputElement: HTMLInputElement, date: string, validityMessage: string): boolean {
     const validFrom = new Date(this.record.validFrom);
@@ -120,8 +117,6 @@ export class MbPnregistryDetail {
     inputElement.setCustomValidity('');
     inputElement.reportValidity();
     return true;
-
-    //console.log(isNaN(validFrom.valueOf()));
   }
 
   private handleInputEvent(ev: InputEvent, recordAtribute: string) {
@@ -136,8 +131,8 @@ export class MbPnregistryDetail {
     return (
       <Host>
         <div class="horizontal-box">
-          <div class="vertical-box">
-            <div class="pacient-heading">
+          <form ref={el => (this.patientForm = el)} class="input-form">
+            <div class="pacient-heading form-heading">
               <h3>Pacient</h3>
               {this.recordId === '@new' && (
                 <div>
@@ -154,150 +149,146 @@ export class MbPnregistryDetail {
               )}
             </div>
 
-            <form ref={el => (this.patientForm = el)} class="input-form">
-              <md-outlined-text-field
-                key={this.newPacient}
-                id="fullname"
-                label="Meno a Priezvisko"
-                class="input-size"
-                value={this.record?.fullName}
-                disabled={!this.newPacient}
-                required
-                oninput={(ev: InputEvent) => this.handleInputEvent(ev, 'fullName')}
-              >
-                <md-icon slot="leading-icon">id_card</md-icon>
-              </md-outlined-text-field>
+            <md-outlined-text-field
+              key={this.newPacient}
+              id="fullname"
+              label="Meno a Priezvisko"
+              class="form-item"
+              value={this.record?.fullName}
+              disabled={!this.newPacient}
+              required
+              oninput={(ev: InputEvent) => this.handleInputEvent(ev, 'fullName')}
+            >
+              <md-icon slot="leading-icon">id_card</md-icon>
+            </md-outlined-text-field>
 
-              <md-outlined-text-field
-                id="pacientid"
-                label="Rodné číslo"
-                class="input-size"
-                type="text"
-                maxlength="10"
-                required
-                pattern="\d*"
-                value={this.record?.patientId}
-                oninput={(ev: InputEvent) => this.handleInputEvent(ev, 'patientId')}
-              >
-                <md-icon slot="leading-icon">fingerprint</md-icon>
-              </md-outlined-text-field>
+            <md-outlined-text-field
+              id="pacientid"
+              label="Rodné číslo"
+              class="form-item"
+              type="text"
+              maxlength="10"
+              required
+              pattern="\d*"
+              value={this.record?.patientId}
+              oninput={(ev: InputEvent) => this.handleInputEvent(ev, 'patientId')}
+            >
+              <md-icon slot="leading-icon">fingerprint</md-icon>
+            </md-outlined-text-field>
 
-              <md-outlined-text-field
-                id="employer"
-                label="Názov zamestnávateľa"
-                class="input-size"
-                required
-                value={this.record?.employer}
-                oninput={(ev: InputEvent) => this.handleInputEvent(ev, 'employer')}
-              >
-                <md-icon slot="leading-icon">corporate_fare</md-icon>
-              </md-outlined-text-field>
+            <md-outlined-text-field
+              id="employer"
+              label="Názov zamestnávateľa"
+              class="form-item"
+              required
+              value={this.record?.employer}
+              oninput={(ev: InputEvent) => this.handleInputEvent(ev, 'employer')}
+            >
+              <md-icon slot="leading-icon">corporate_fare</md-icon>
+            </md-outlined-text-field>
 
-              <h3>Plánovaná kontrola</h3>
+            <h3 class="form-heading">Plánovaná kontrola</h3>
 
-              <div>
-                <label htmlFor="check">Vybavená:</label>
-                <md-checkbox
-                  id="check"
-                  checked={this.record?.checkUpDone}
-                  onChange={(ev: Event) => {
-                    if (this.record) {
-                      this.record.checkUpDone = (ev.target as HTMLInputElement).checked;
-                    }
-                  }}
-                ></md-checkbox>
-              </div>
-
-              <md-outlined-text-field
-                id="checkup"
-                label="Dátum kontroly"
-                class="input-size"
-                type="date"
-                value={this.record?.checkUp}
-                oninput={(ev: InputEvent) => {
+            <div class="form-heading">
+              <label htmlFor="check">Vybavená:</label>
+              <md-checkbox
+                id="check"
+                checked={this.record?.checkUpDone}
+                onChange={(ev: Event) => {
                   if (this.record) {
-                    this.record.checkUp = (ev.target as HTMLInputElement).value;
+                    this.record.checkUpDone = (ev.target as HTMLInputElement).checked;
                   }
                 }}
-              >
-                <md-icon slot="leading-icon">edit_calendar</md-icon>
-              </md-outlined-text-field>
-            </form>
+              ></md-checkbox>
+            </div>
 
-            <md-outlined-button class="button" onClick={() => this.detailClosed.emit('back')}>
+            <md-outlined-text-field
+              id="checkup"
+              label="Dátum kontroly"
+              class="form-item"
+              type="date"
+              value={this.record?.checkUp}
+              oninput={(ev: InputEvent) => {
+                if (this.record) {
+                  this.record.checkUp = (ev.target as HTMLInputElement).value;
+                }
+              }}
+            >
+              <md-icon slot="leading-icon">edit_calendar</md-icon>
+            </md-outlined-text-field>
+
+            <md-outlined-button class="alight-left button" onClick={() => this.detailClosed.emit('back')}>
               <md-icon slot="icon">arrow_back</md-icon>
               Späť
             </md-outlined-button>
-          </div>
+          </form>
 
-          <div class="vertical-box">
-            <h3>Detail práceneschopnosti</h3>
+          <form ref={el => (this.detailForm = el)} class="input-form">
+            <h3 class="form-heading">Detail práceneschopnosti</h3>
 
-            <form ref={el => (this.detailForm = el)} class="input-form">
-              <md-outlined-text-field type="text" label="PN ID" class="input-size" value={this.record?.id} disabled>
-                <md-icon slot="leading-icon">fingerprint</md-icon>
-              </md-outlined-text-field>
+            <md-outlined-text-field type="text" label="PN ID" class="form-item" value={this.record?.id} disabled>
+              <md-icon slot="leading-icon">fingerprint</md-icon>
+            </md-outlined-text-field>
 
-              <md-outlined-text-field type="date" label="Dátum vzniku PN" class="input-size" value={this.record?.issued} disabled>
-                <md-icon slot="leading-icon">calendar_month</md-icon>
-              </md-outlined-text-field>
+            <md-outlined-text-field type="date" label="Dátum vzniku PN" class="form-item" value={this.record?.issued} disabled>
+              <md-icon slot="leading-icon">calendar_month</md-icon>
+            </md-outlined-text-field>
 
-              <md-outlined-select
-                label="Dôvod"
-                class="input-size"
-                required
-                value={this.record?.reason}
-                onChange={(ev: InputEvent) => {
-                  this.handleInputEvent(ev, 'reason');
-                }}
-              >
-                <md-icon slot="leading-icon">sick</md-icon>
-                <md-select-option value="choroba">
-                  <div>choroba</div>
-                </md-select-option>
-                <md-select-option value="úraz">
-                  <div>úraz</div>
-                </md-select-option>
-                <md-select-option value="choroba z povolania">
-                  <div>choroba z povolania</div>
-                </md-select-option>
-                <md-select-option value="karantenne opatrenie/izolácia">
-                  <div>karantenne opatrenie/izolácia</div>
-                </md-select-option>
-                <md-select-option value="pracovný úraz">
-                  <div>pracovný úraz</div>
-                </md-select-option>
-                <md-select-option value="iné">
-                  <div>iné</div>
-                </md-select-option>
-              </md-outlined-select>
+            <md-outlined-select
+              label="Dôvod"
+              class="form-item"
+              required
+              value={this.record?.reason}
+              onChange={(ev: InputEvent) => {
+                this.handleInputEvent(ev, 'reason');
+              }}
+            >
+              <md-icon slot="leading-icon">sick</md-icon>
+              <md-select-option value="choroba">
+                <div>choroba</div>
+              </md-select-option>
+              <md-select-option value="úraz">
+                <div>úraz</div>
+              </md-select-option>
+              <md-select-option value="choroba z povolania">
+                <div>choroba z povolania</div>
+              </md-select-option>
+              <md-select-option value="karantenne opatrenie/izolácia">
+                <div>karantenne opatrenie/izolácia</div>
+              </md-select-option>
+              <md-select-option value="pracovný úraz">
+                <div>pracovný úraz</div>
+              </md-select-option>
+              <md-select-option value="iné">
+                <div>iné</div>
+              </md-select-option>
+            </md-outlined-select>
 
-              <md-outlined-text-field
-                type="date"
-                label="Začiatok platnosti"
-                class="input-size"
-                required
-                value={this.record?.validFrom}
-                oninput={(ev: InputEvent) => this.handleInputEvent(ev, 'validFrom')}
-              >
-                <md-icon slot="leading-icon">calendar_month</md-icon>
-              </md-outlined-text-field>
+            <md-outlined-text-field
+              type="date"
+              label="Začiatok platnosti"
+              class="form-item"
+              required
+              value={this.record?.validFrom}
+              oninput={(ev: InputEvent) => this.handleInputEvent(ev, 'validFrom')}
+            >
+              <md-icon slot="leading-icon">calendar_month</md-icon>
+            </md-outlined-text-field>
 
-              <md-outlined-text-field
-                id="valid-until"
-                type="date"
-                label="Predpokladané trvanie do"
-                class="input-size"
-                required
-                supporting-text="*PN platí aj vrátane tohto dňa"
-                value={this.record?.validUntil}
-                oninput={(ev: InputEvent) => this.handleInputEvent(ev, 'validUntil')}
-              >
-                <md-icon slot="leading-icon">calendar_month</md-icon>
-              </md-outlined-text-field>
-            </form>
+            <md-outlined-text-field
+              id="valid-until"
+              type="date"
+              label="Predpokladané trvanie do"
+              class="form-item"
+              required
+              supporting-text="*PN platí aj vrátane tohto dňa"
+              value={this.record?.validUntil}
+              oninput={(ev: InputEvent) => this.handleInputEvent(ev, 'validUntil')}
+            >
+              <md-icon slot="leading-icon">calendar_month</md-icon>
+            </md-outlined-text-field>
 
-            <div class="save-cancel">
+            <div class="alight-right">
               <md-outlined-button class="button" onClick={() => this.openDialog()}>
                 <md-icon slot="icon">delete</md-icon>
                 Zmazať
@@ -317,7 +308,7 @@ export class MbPnregistryDetail {
                 Uložiť
               </md-filled-tonal-button>
             </div>
-          </div>
+          </form>
         </div>
 
         {this.loading && <md-linear-progress indeterminate class="loading"></md-linear-progress>}

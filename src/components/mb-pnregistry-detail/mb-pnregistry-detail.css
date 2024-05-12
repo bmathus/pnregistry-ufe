@@ -13,21 +13,29 @@
   border-radius: 12px;
 }
 
-.vertical-box {
+.input-form {
+  --_wl-editor_gap: var(--wl-gap, 0rem);
   display: flex;
   flex-direction: column;
-  align-items: start;
+  gap: var(--_wl-editor_gap);
+  width: 400px;
 }
 
-.vertical-box label {
-  padding-right: 0.5rem;
+.input-form .form-item {
+  margin-bottom: 1.8rem;
+  height: 56px;
 }
 
-.vertical-box h3{
+.input-form .form-heading {
+  margin-bottom: 1.4rem;
+}
+
+.input-form h3 {
   margin-bottom: 0rem;
   margin-top: 0rem;
 }
-.vertical-box .pacient-heading {
+
+.input-form .pacient-heading {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -35,36 +43,29 @@
   align-items: flex-start;
 }
 
+.input-form label {
+  padding-right: 0.5rem;
+}
+
+.input-form md-outlined-select::part(menu) {
+  --md-menu-container-color: #eff1f3;
+}
+
 .button {
   --md-filled-tonal-button-container-shape: 10px;
   --md-outlined-button-container-shape: 10px
 }
 
-.vertical-box .save-cancel {
+.input-form .alight-right {
   align-self: flex-end;
 }
 
-.vertical-box .save-cancel .save-button {
+.input-form .alight-left {
+  align-self: flex-start;
+}
+
+.input-form .save-button {
   margin-left: 0.5rem;
-}
-
-
- /* forms */
-.input-form {
-  --_wl-editor_gap: var(--wl-gap, 1.8rem);
-  display: flex;
-  flex-direction: column;
-  gap: var(--_wl-editor_gap);
-  width: 400px;
-  margin-bottom: 1.5rem;
-}
-
-.input-form .input-size{
-  height: 56px;
-}
-
-.input-form md-outlined-select::part(menu) {
-  --md-menu-container-color: #eff1f3;
 }
 
 /* delete dialog */
