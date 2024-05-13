@@ -71,7 +71,17 @@ export class MbPnregistryList {
 
   private isoDateToLocale(iso: string) {
     if (!iso) return '';
-    return new Date(Date.parse(iso)).toLocaleString('sk-SK');
+    return new Date(Date.parse(iso)).toLocaleDateString();
+  }
+
+  private getRecordExpirationState(record: Record): string {
+    const validUntil = new Date(record.validUntil).setHours(0, 0, 0, 0);
+    const today = new Date().setHours(0, 0, 0, 0);
+    if (today > validUntil) {
+      return 'neaktívna';
+    } else {
+      return 'aktívna';
+    }
   }
 
   render() {
@@ -123,13 +133,15 @@ export class MbPnregistryList {
             </md-list-item>
 
             {this.expandedPatientId === patientId && (
-              <div class="pn-item">
+              <div class="pn-list">
                 <md-list>
                   {records.map((record, index) => (
                     <md-list-item key={index} type="button" onClick={() => this.recordClicked.emit(record.id)}>
                       <md-icon slot="start">sick</md-icon>
-                      <div>PN č. {record.id}</div>
-                      <div slot="supporting-text">Stav: trva</div>
+                      <div>PN ID: {record.id}</div>
+                      <div slot="supporting-text">
+                        Stav: {this.getRecordExpirationState(record) == 'aktívna' ? <span class="active">aktívna</span> : <span class="inactive">neaktívna</span>}
+                      </div>
                     </md-list-item>
                   ))}
                 </md-list>

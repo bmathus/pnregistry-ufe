@@ -13,7 +13,7 @@ export class MbPnregistryDetail {
   @State() record: Record;
   @State() isDialogOpen: boolean = false; // Track the state of the dialog
   @State() loading: boolean = true;
-  @State() errorMessage: string;
+  @State() responseMessage: string;
   @State() isValid: boolean = false;
   @State() newPacient: boolean;
 
@@ -105,8 +105,8 @@ export class MbPnregistryDetail {
   }
 
   private checkDatesValidity(inputElement: HTMLInputElement, date: string, validityMessage: string): boolean {
-    const validFrom = new Date(this.record.validFrom);
-    const dateToValid = new Date(date);
+    const validFrom = new Date(this.record.validFrom).setHours(0, 0, 0, 0);
+    const dateToValid = new Date(date).setHours(0, 0, 0, 0);
 
     if (validFrom > dateToValid) {
       inputElement.setCustomValidity(validityMessage);
@@ -217,7 +217,7 @@ export class MbPnregistryDetail {
               <md-icon slot="leading-icon">edit_calendar</md-icon>
             </md-outlined-text-field>
 
-            <md-outlined-button class="alight-left button" onClick={() => this.detailClosed.emit('back')}>
+            <md-outlined-button type="button" class="alight-left button" onClick={() => this.detailClosed.emit('back')}>
               <md-icon slot="icon">arrow_back</md-icon>
               Späť
             </md-outlined-button>
@@ -289,12 +289,13 @@ export class MbPnregistryDetail {
             </md-outlined-text-field>
 
             <div class="alight-right">
-              <md-outlined-button class="button" onClick={() => this.openDialog()}>
+              <md-outlined-button type="button" class="button" onClick={() => this.openDialog()}>
                 <md-icon slot="icon">delete</md-icon>
                 Zmazať
               </md-outlined-button>
 
               <md-filled-tonal-button
+                type="button"
                 class="button save-button"
                 onClick={() => {
                   if (this.record) {
@@ -312,6 +313,20 @@ export class MbPnregistryDetail {
         </div>
 
         {this.loading && <md-linear-progress indeterminate class="loading"></md-linear-progress>}
+
+        <div class="response-card">
+          <md-icon class="icon negative" slot="icon">
+            error
+          </md-icon>
+          <div class="negative">Chyba pri ukladaní PN záznamu: {'Pacient s daným rodným číslom má 1 aktívnu PN'}</div>
+        </div>
+
+        <div class="response-card">
+          <md-icon class="icon positive" slot="icon">
+            done_outline
+          </md-icon>
+          <div class="positive">PN záznam bol úspešne uložený</div>
+        </div>
 
         <md-dialog type="alert" open={this.isDialogOpen} class="dialog">
           <div slot="headline">Potvrdenie zmazania</div>

@@ -140,6 +140,7 @@ components:
   schemas:
     Record:
       type: object
+      required: [id, patientId, employer, reason, issued, validFrom, validUntil,checkUpDone]
       properties:
         id:
           type: string
@@ -163,24 +164,24 @@ components:
           description: Reason/couse why the PN was issued for the pacient
         issued:
           type: string
-          format: date-time
-          example: '2038-12-24T10:05:00Z'
-          description: Timestamp when the PN record was created (issued)
+          format: date
+          example: '2023-12-20'
+          description: Date when the PN record was created (issued)
         validFrom:
           type: string
           format: date
-          example: '2017-07-21'
+          example: '2023-12-23'
           description: Date since the issued PN record is valid
         validUntil:
           type: string
           format: date
-          example: '2017-08-21'
+          example: '2024-02-23'
           description: Date when the issued PN record validity ends (expires)
         checkUp:
           type: string
-          format: date-time
-          example: '2038-12-24T10:40:00Z'
-          description: Timestamp when the check up associated with PN record is planned
+          format: date
+          example: '2024-01-10'
+          description: Date when the check up associated with PN record is planned
         checkUpDone:
           type: boolean
           example: true
@@ -196,45 +197,45 @@ components:
         patientId: '9912105126'
         employer: Volkswagen Slovakia
         reason: choroba
-        issued: '2038-12-24T10:05:00Z'
-        validFrom: '2017-07-21'
-        validUntil: '2017-08-21'
-        checkUp: '2038-12-24T10:40:00Z'
+        issued: '2023-12-20'
+        validFrom: '2023-12-29'
+        validUntil: '2024-02-29'
+        checkUp: '2024-01-29'
         checkUpDone: true
     RecordsExample:
       summary: List of all PN records in the system
       description: Example list containing 3 PN records - 1 for patient Matúš and 2 for patient Lucia
       value:
-        - id: x321ab3
+        - id: xy1gb3
           fullName: Matúš Bojko
           patientId: '9912105126'
           employer: 'ESET, spol. s.r.o'
           reason: choroba
-          issued: '2023-12-20T10:05:00Z'
+          issued: '2024-01-20'
           validFrom: '2024-01-20'
           validUntil: '2024-06-20'
-          checkUp: '2024-04-12T10:00:00Z'
+          checkUp: '2024-04-12'
           checkUpDone: false
         - id: c3f1ac9
           fullName: Lucia Hanuláková
           patientId: '0155171489'
           employer: 'Lekáreň Dr.Max'
           reason: 'pracovný úraz'
-          issued: '2024-02-20T10:05:00Z'
+          issued: '2024-02-21'
           validFrom: '2024-02-21'
-          validUntil: '2024-03-21'
-          checkUp: '2024-03-10T10:00:00Z'
+          validUntil: '2022-05-12'
+          checkUp: '2024-02-25'
           checkUpDone: true
         - id: g4f5hc6
           fullName: Lucia Hanuláková
           patientId: '0155171489'
           employer: 'Lekáreň Benu'
           reason: 'iné'
-          issued: '2024-09-20T10:05:00Z'
+          issued: '2024-09-29'
           validFrom: '2024-09-29'
           validUntil: '2024-10-29'
-          checkUp: '2024-10-19T10:00:00Z'
-          checkUpDone: true
+          checkUp: '2024-10-13'
+          checkUpDone: false
 
 
 
