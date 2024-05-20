@@ -25,6 +25,7 @@ export class MbPnregistryList {
     try {
       const response = await PnRegistryRecordsApiFactory(undefined, this.apiBase).getRecordAll();
       this.loading = false;
+
       if (response.status < 299) {
         responseData = response.data;
       } else {
@@ -69,18 +70,22 @@ export class MbPnregistryList {
     this.expandedPatientId = this.expandedPatientId === patientId ? null : patientId;
   }
 
-  private isoDateToLocale(iso: string) {
-    if (!iso) return '';
-    return new Date(Date.parse(iso)).toLocaleDateString();
-  }
+  // private isoDateToLocale(iso: string) {
+  //   if (!iso) return '';
+  //   const date = new Date(Date.parse(iso)).toLocaleDateString();
+  //   return date;
+  // }
 
   private getRecordExpirationState(record: Record): string {
     const validUntil = new Date(record.validUntil).setHours(0, 0, 0, 0);
+    const validFrom = new Date(record.validFrom).setHours(0, 0, 0, 0);
+
     const today = new Date().setHours(0, 0, 0, 0);
-    if (today > validUntil) {
-      return 'neaktívna';
-    } else {
+    console.log('today', new Date());
+    if (today >= validFrom && today <= validUntil) {
       return 'aktívna';
+    } else {
+      return 'neaktívna';
     }
   }
 
@@ -127,7 +132,7 @@ export class MbPnregistryList {
           <div>
             <md-list-item type="button" class="patient-item" onClick={() => this.toggleExpand(patientId)}>
               <div slot="headline">{records[0].fullName}</div>
-              <div slot="supporting-text">{'Najbližšia kontrola: ' + this.isoDateToLocale(records[0].checkUp)}</div>
+              <div slot="supporting-text">{'Rodné číslo : ' + records[0].patientId}</div>
               <md-icon slot="start">fingerprint</md-icon>
               <md-icon slot="end">{this.expandedPatientId === patientId ? 'expand_less' : 'expand_more'}</md-icon>
             </md-list-item>

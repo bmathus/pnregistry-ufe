@@ -140,7 +140,7 @@ components:
   schemas:
     Record:
       type: object
-      required: [id, patientId, employer, reason, issued, validFrom, validUntil,checkUpDone]
+      required: [id, patientId, employer, reason, issued, validFrom, validUntil]
       properties:
         id:
           type: string
@@ -196,7 +196,7 @@ components:
         fullName: Ľudomír Zlostný
         patientId: '9912105126'
         employer: Volkswagen Slovakia
-        reason: choroba
+        reason: úraz
         issued: '2023-12-20'
         validFrom: '2023-12-29'
         validUntil: '2024-02-29'

@@ -3,6 +3,10 @@
   align-self: center;
 }
 
+.detail-heading {
+  margin-left: 0.5rem;
+}
+
 .horizontal-box {
   display: flex;
   flex-direction: row;

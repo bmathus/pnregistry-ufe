@@ -60,7 +60,7 @@ export class MbPnregistryApp {
         <md-divider></md-divider>
         <div class="app-content">
           {element === 'detail' ? (
-            <mb-pnregistry-detail record-id={recordId} onDetail-closed={() => navigate('./list')}></mb-pnregistry-detail>
+            <mb-pnregistry-detail api-base={this.apiBase} record-id={recordId} onDetail-closed={() => navigate('./list')}></mb-pnregistry-detail>
           ) : (
             <mb-pnregistry-list api-base={this.apiBase} onRecord-clicked={(ev: CustomEvent<string>) => navigate('./record/' + ev.detail)}></mb-pnregistry-list>
           )}

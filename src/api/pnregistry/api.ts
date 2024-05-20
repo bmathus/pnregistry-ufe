@@ -34,7 +34,7 @@ export interface Record {
      * @type {string}
      * @memberof Record
      */
-    'id'?: string;
+    'id': string;
     /**
      * Full name of pacient whom the PN record was issued
      * @type {string}
@@ -46,39 +46,39 @@ export interface Record {
      * @type {string}
      * @memberof Record
      */
-    'patientId'?: string;
+    'patientId': string;
     /**
      * Pacient\'s employer linked to the issued PN record
      * @type {string}
      * @memberof Record
      */
-    'employer'?: string;
+    'employer': string;
     /**
      * Reason/couse why the PN was issued for the pacient
      * @type {string}
      * @memberof Record
      */
-    'reason'?: string;
+    'reason': string;
     /**
-     * Timestamp when the PN record was created (issued)
+     * Date when the PN record was created (issued)
      * @type {string}
      * @memberof Record
      */
-    'issued'?: string;
+    'issued': string;
     /**
      * Date since the issued PN record is valid
      * @type {string}
      * @memberof Record
      */
-    'validFrom'?: string;
+    'validFrom': string;
     /**
      * Date when the issued PN record validity ends (expires)
      * @type {string}
      * @memberof Record
      */
-    'validUntil'?: string;
+    'validUntil': string;
     /**
-     * Timestamp when the check up associated with PN record is planned
+     * Date when the check up associated with PN record is planned
      * @type {string}
      * @memberof Record
      */
