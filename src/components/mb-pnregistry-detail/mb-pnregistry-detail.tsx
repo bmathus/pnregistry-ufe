@@ -182,7 +182,7 @@ export class MbPnregistryDetail {
               required
               oninput={(ev: InputEvent) => this.handleInputEvent(ev, 'fullName')}
             >
-              <md-icon slot="leading-icon">id_card</md-icon>
+              <md-icon slot="leading-icon">badge</md-icon>
             </md-outlined-text-field>
 
             <md-outlined-text-field
