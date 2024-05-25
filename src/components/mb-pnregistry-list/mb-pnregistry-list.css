@@ -8,7 +8,7 @@
 .empty-list-info {
   display: inline-block;
   text-align: center;
-  border: 1px solid #d1d1d1;
+  border: 1px solid var(--md-sys-color-surface-variant-light);
   margin: auto;
   margin-top: 1.5rem;
   padding: 20px;
@@ -17,12 +17,12 @@
 }
 
 .empty-list-info h4{
-  color: #505050;
+  color: var(--md-sys-color-inverse-surface-light);
   margin: 0;
   margin-top: 10px;
 }
 .empty-list-info .icon {
-  color: #505050;
+  color: var(--md-sys-color-inverse-surface-light);
 }
 
 
@@ -41,8 +41,6 @@
 .list-header .title {
   margin-left: 0.5rem;
 }
-
-
 
 /* List */
 .patient-item, .pn-list {

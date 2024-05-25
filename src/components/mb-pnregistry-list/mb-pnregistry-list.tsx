@@ -9,30 +9,31 @@ import { PnRegistryRecordsApiFactory, Record } from '../../api/pnregistry';
 export class MbPnregistryList {
   @Prop() apiBase: string;
 
-  @Event({ eventName: 'record-clicked' }) recordClicked: EventEmitter<string>;
-
-  @State() expandedPatientId: string | null = null;
-  @State() loading: boolean = true;
-  @State() pnRecordsByPatient: Map<string, Record[]> = new Map();
+  @State() expandedPatientId: string | null = null; //expand patient PN list when clicked
+  @State() loading: boolean = true; // loading state when fetching API
+  @State() pnRecordsByPatient: Map<string, Record[]> = new Map(); // grouped PN records by patient ID
   @State() errorMessage: string;
+
+  @Event({ eventName: 'record-clicked' }) recordClicked: EventEmitter<string>;
 
   async componentWillLoad() {
     this.loadPnRecords();
   }
 
-  private async getPnRecordsAsync() {
-    let responseData = [];
+  private async getPnRecordsAsync(): Promise<Record[]> {
+    let responseData: Record[] = [];
+    this.loading = true;
     try {
       const response = await PnRegistryRecordsApiFactory(undefined, this.apiBase).getRecordAll();
-      this.loading = false;
 
       if (response.status < 299) {
-        responseData = response.data;
+        responseData = response.data ? response.data : [];
       } else {
-        this.errorMessage = `Cannot retrieve list of PN records: ${response.statusText}`;
+        const errorResponse = response.data as unknown as ErrorResponse;
+        this.errorMessage = `Chyba pri načítaní zoznamu PN záznamov - ${errorResponse?.message || response.statusText}`;
       }
     } catch (err: any) {
-      this.errorMessage = `Cannot retrieve list of PN records: ${err.message || 'unknown'}`;
+      this.errorMessage = `Chyba pri načítaní zoznamu PN záznamov - ${err.response?.status || ''}: ${err.response?.data.message || err.message || 'unknown'}`;
     }
     this.loading = false;
 
@@ -40,16 +41,18 @@ export class MbPnregistryList {
   }
 
   private async loadPnRecords() {
+    // fetch records from api
     const pnRecords = await this.getPnRecordsAsync();
+    // group records by patient id
     this.pnRecordsByPatient = this.groupByPatientId(pnRecords);
   }
 
-  private groupByPatientId(records: Record[]) {
-    const grouped = new Map();
+  private groupByPatientId(records: Record[]): Map<string, Record[]> {
+    const grouped = new Map<string, Record[]>();
 
     records.forEach(record => {
       if (!grouped.has(record.patientId)) {
-        // If no entry exists, create one with this record
+        // if no entry exists, create one with this record
         grouped.set(record.patientId, [record]);
       } else {
         const recordsList = grouped.get(record.patientId);
@@ -57,7 +60,7 @@ export class MbPnregistryList {
           // New record is more recent, so prepend
           recordsList.unshift(record);
         } else {
-          // New record is not more recent, so append
+          // new record is not more recent, so append
           recordsList.push(record);
         }
       }
@@ -66,16 +69,12 @@ export class MbPnregistryList {
     return grouped;
   }
 
+  // expands list of records when patient item clicked
   private toggleExpand(patientId: string) {
     this.expandedPatientId = this.expandedPatientId === patientId ? null : patientId;
   }
 
-  // private isoDateToLocale(iso: string) {
-  //   if (!iso) return '';
-  //   const date = new Date(Date.parse(iso)).toLocaleDateString();
-  //   return date;
-  // }
-
+  // calculates state of PN record - active or inactive
   private getRecordExpirationState(record: Record): string {
     const validUntil = new Date(record.validUntil).setHours(0, 0, 0, 0);
     const validFrom = new Date(record.validFrom).setHours(0, 0, 0, 0);
@@ -93,7 +92,7 @@ export class MbPnregistryList {
     return (
       <Host>
         <div class="list-header">
-          <h3 class="title">Zoznam PN podla pacientov</h3>
+          <h3 class="title">Zoznam PN podľa pacientov:</h3>
           <md-filled-tonal-button class="add-button" onClick={() => this.recordClicked.emit('@new')}>
             <md-icon slot="icon">add</md-icon>
             Pridať PN
@@ -113,7 +112,7 @@ export class MbPnregistryList {
               ) : (
                 <div class="empty-list-info">
                   <md-icon class="icon">info</md-icon>
-                  <h4>V systéme niesu žiadné záznami o PN</h4>
+                  <h4>V systéme niesu žiadne záznamy o PN</h4>
                 </div>
               )
             ) : (
@@ -125,6 +124,7 @@ export class MbPnregistryList {
     );
   }
 
+  // renders PN list
   private renderList() {
     return (
       <md-list>

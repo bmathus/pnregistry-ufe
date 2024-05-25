@@ -1,11 +1,5 @@
 import { Component, Host, h, Prop, EventEmitter, Event, State } from '@stencil/core';
-import { Record, PnRegistryRecordsApiFactory } from '../../api/pnregistry';
-
-interface ErrorResponse {
-  error?: string;
-  message: string;
-  status: number;
-}
+import { Record, PnRegistryRecordsApiFactory, RecordReasonEnum } from '../../api/pnregistry';
 
 @Component({
   tag: 'mb-pnregistry-detail',
@@ -13,29 +7,28 @@ interface ErrorResponse {
   shadow: true,
 })
 export class MbPnregistryDetail {
-  @Prop() recordId: string;
+  @Prop() recordId: string; // recordId from path
   @Prop() apiBase: string;
 
-  @State() record: Record;
-  @State() isDialogOpen: boolean = false; // Track the state of the dialog
-  @State() loading: boolean = false;
-  @State() responseMessage: string;
+  @State() record: Record; // loaded/edited record
+  @State() isDialogOpen: boolean = false; // open/close delete dialog
+  @State() loading: boolean = false; // loading state when fetching API
+  @State() responseMessage: string; // response from API
+  @State() isValid: boolean = false; // tracks form validity
+  @State() newPacient: boolean; //'Nový' checkbox
 
-  @State() isValid: boolean = false;
-  @State() newPacient: boolean;
-
-  private patientForm: HTMLFormElement;
-  private detailForm: HTMLFormElement;
-  private responseSuccess: boolean = false;
+  private patientForm: HTMLFormElement; // left form
+  private detailForm: HTMLFormElement; // right form
+  private responseSuccess: boolean = false; //if API response was 2xx
 
   @Event({ eventName: 'detail-closed' }) detailClosed: EventEmitter<string>;
 
-  // Function to open the dialog
+  // opens delete dialog
   private openDialog() {
     this.isDialogOpen = true;
   }
 
-  // Function to close the dialog
+  // closes delete dialog
   private closeDialog() {
     this.isDialogOpen = false;
   }
@@ -49,19 +42,21 @@ export class MbPnregistryDetail {
       id: '@new',
       patientId: '',
       employer: '',
-      reason: '',
+      reason: RecordReasonEnum.Choroba,
       issued: new Date().toISOString().split('T')[0],
       validFrom: new Date().toISOString().split('T')[0],
       validUntil: this.createIsoDateAfterWeek(),
     };
   }
 
-  private createIsoDateAfterWeek() {
+  //creates date after week from today
+  private createIsoDateAfterWeek(): string {
     const today = new Date();
     today.setDate(today.getDate() + 7);
     return today.toISOString().split('T')[0];
   }
 
+  // fetches record from API on component load
   private async getPnRecordAsync() {
     if (this.recordId === '@new') {
       this.isValid = false;
@@ -85,11 +80,12 @@ export class MbPnregistryDetail {
         this.responseMessage = `Chyba pri načítaní PN záznamu: ${errorResponse?.message || response.statusText}`;
       }
     } catch (err: any) {
-      this.responseMessage = `Chyba pri načítaní PN záznamu - ${err.response?.status}: ${err.response?.data.message || err.message || 'unknown'}`;
+      this.responseMessage = `Chyba pri načítaní PN záznamu - ${err.response?.status || ''}: ${err.response?.data.message || err.message || 'unknown'}`;
     }
     this.loading = false;
   }
 
+  // update/create record API call
   private async createUpdateRecord() {
     this.isValid = false;
     if (this.record) {
@@ -115,7 +111,6 @@ export class MbPnregistryDetail {
       const response = this.recordId === '@new' ? await api.createRecord(this.record) : await api.updateRecord(this.recordId, this.record);
 
       if (response.status < 299) {
-        console.log('Stored succesfully');
         this.record = response.data;
         this.responseSuccess = true;
         this.responseMessage = `PN záznam bol úspešne uložený - ${response?.status}`;
@@ -124,12 +119,13 @@ export class MbPnregistryDetail {
         this.responseMessage = `Chyba pri ukladaní PN záznamu: ${errorResponse?.message || response.statusText}`;
       }
     } catch (err: any) {
-      this.responseMessage = `Chyba pri ukladaní PN záznamu - ${err.response?.status}: ${err.response?.data.message || err.message || 'unknown'}`;
+      this.responseMessage = `Chyba pri ukladaní PN záznamu - ${err.response?.status || ''}: ${err.response?.data.message || err.message || 'unknown'}`;
     }
 
     this.loading = false;
   }
 
+  // delete record API call
   private async deleteRecord() {
     this.closeDialog();
     this.loading = true;
@@ -138,13 +134,12 @@ export class MbPnregistryDetail {
       const response = await PnRegistryRecordsApiFactory(undefined, this.apiBase).deleteRecord(this.recordId);
       if (response.status < 299) {
         this.detailClosed.emit('back');
-        console.log('Deleted succesfully');
       } else {
         const errorResponse = response.data as unknown as ErrorResponse;
         this.responseMessage = `Chyba pri odstraňovaní PN záznamu: ${errorResponse?.message || response.statusText}`;
       }
     } catch (err: any) {
-      this.responseMessage = `Chyba pri odstraňovaní PN záznamu - ${err.response?.status}: ${err.response?.data.message || err.message || 'unknown'}`;
+      this.responseMessage = `Chyba pri odstraňovaní PN záznamu - ${err.response?.status || ''}: ${err.response?.data.message || err.message || 'unknown'}`;
     }
     this.loading = false;
   }
@@ -177,6 +172,7 @@ export class MbPnregistryDetail {
               id="fullname"
               label="Meno a Priezvisko"
               class="form-item"
+              maxlength="50"
               value={this.record?.fullName}
               disabled={!this.newPacient}
               required
@@ -196,7 +192,7 @@ export class MbPnregistryDetail {
               value={this.record?.patientId}
               oninput={(ev: InputEvent) => {
                 this.handleInputEvent(ev, 'patientId');
-                if (this.recordId !== '@new') {
+                if (this.record && this.recordId !== '@new') {
                   this.record.fullName = '';
                 }
               }}
@@ -208,6 +204,7 @@ export class MbPnregistryDetail {
               id="employer"
               label="Názov zamestnávateľa"
               class="form-item"
+              maxlength="50"
               required
               value={this.record?.employer}
               oninput={(ev: InputEvent) => this.handleInputEvent(ev, 'employer')}
@@ -272,22 +269,22 @@ export class MbPnregistryDetail {
               }}
             >
               <md-icon slot="leading-icon">sick</md-icon>
-              <md-select-option value="choroba">
+              <md-select-option value={RecordReasonEnum.Choroba}>
                 <div>choroba</div>
               </md-select-option>
-              <md-select-option value="úraz">
+              <md-select-option value={RecordReasonEnum.Uraz}>
                 <div>úraz</div>
               </md-select-option>
-              <md-select-option value="choroba z povolania">
+              <md-select-option value={RecordReasonEnum.ChorobaZPovolania}>
                 <div>choroba z povolania</div>
               </md-select-option>
-              <md-select-option value="karantenne opatrenie/izolácia">
-                <div>karantenne opatrenie/izolácia</div>
+              <md-select-option value={RecordReasonEnum.KarantenneOpatrenieIzolacia}>
+                <div>karanténne opatrenie/izolácia</div>
               </md-select-option>
-              <md-select-option value="pracovný úraz">
+              <md-select-option value={RecordReasonEnum.PracovnyUraz}>
                 <div>pracovný úraz</div>
               </md-select-option>
-              <md-select-option value="iné">
+              <md-select-option value={RecordReasonEnum.Ine}>
                 <div>iné</div>
               </md-select-option>
             </md-outlined-select>
@@ -378,6 +375,7 @@ export class MbPnregistryDetail {
     );
   }
 
+  //sets field values of record from input fields and validates them
   private handleInputEvent(ev: InputEvent, recordAtribute: string) {
     if (this.record) {
       const target = ev.target as HTMLInputElement;
@@ -386,10 +384,10 @@ export class MbPnregistryDetail {
     }
   }
 
+  //validates all form fields upon clicking 'Uložiť' button
   private checkFormValidity(formElement: HTMLFormElement) {
     let valid = true;
 
-    // check validity of elements
     for (let i = 0; i < formElement.children.length; i++) {
       const element = formElement.children[i] as HTMLInputElement;
       let elementValid = true;
@@ -422,6 +420,7 @@ export class MbPnregistryDetail {
     }
   }
 
+  // when input is valid clears its validity error message
   private clearValidityError(inputElement: HTMLInputElement) {
     if ('reportValidity' in inputElement) {
       inputElement.setCustomValidity('');
@@ -433,13 +432,12 @@ export class MbPnregistryDetail {
         inputElement.valueAsDate = undefined;
         return;
       }
-      console.log('reseting element', inputElement.id);
       inputElement.reportValidity();
     }
   }
 
+  // validates inputs
   private checkInputValidity(inputElement: HTMLInputElement): boolean {
-    // Directly check and report validity for the target element
     if ('reportValidity' in inputElement) {
       inputElement.setCustomValidity('');
       if (inputElement.validity.valueMissing) {
@@ -456,12 +454,12 @@ export class MbPnregistryDetail {
     return true;
   }
 
-  private checkDateRange(inputElement: HTMLInputElement, date: string) {
+  // validates date fields to be between 02/01/0001 and 31/12/9999
+  private checkDateRange(inputElement: HTMLInputElement, date: string): boolean {
     const dateToValid = new Date(date).setHours(0, 0, 0, 0);
     const maxDate = new Date('9999-12-31T00:00:00Z').setHours(0, 0, 0, 0);
     const minDate = new Date('0001-01-01T00:00:00Z').setHours(0, 0, 0, 0);
 
-    console.log('validating range:', inputElement.id);
     if (date && dateToValid > maxDate) {
       inputElement.setCustomValidity('Maximalny povolený dátum je 31/12/9999');
       inputElement.reportValidity();
@@ -471,16 +469,16 @@ export class MbPnregistryDetail {
       inputElement.reportValidity();
       return false;
     }
-
     return true;
   }
 
+  // validates if 'valid until' date is on or after 'valid from' date
+  // validates if 'checkup' date is on or after 'valid from' date
   private checkDatesValidity(inputElement: HTMLInputElement, date: string, validityMessage: string): boolean {
     const validFrom = new Date(this.record.validFrom).setHours(0, 0, 0, 0);
     const dateToValid = new Date(date).setHours(0, 0, 0, 0);
 
     if (validFrom > dateToValid) {
-      console.log('invalid');
       inputElement.setCustomValidity(validityMessage);
       inputElement.reportValidity();
       return false;

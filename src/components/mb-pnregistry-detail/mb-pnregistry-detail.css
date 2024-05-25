@@ -11,7 +11,7 @@
   display: flex;
   flex-direction: row;
   gap: 1.5rem;
-  border: 1px solid #d1d1d1;
+  border: 1px solid var(--md-sys-color-surface-variant-light);
   margin-top: 1.5rem;
   padding: 1.5rem;
   border-radius: 12px;
@@ -52,7 +52,7 @@
 }
 
 .input-form md-outlined-select::part(menu) {
-  --md-menu-container-color: #eff1f3;
+  --md-menu-container-color: var(--md-sys-color-inverse-on-surface-light);
 }
 
 .button {
@@ -75,7 +75,7 @@
 /* delete dialog */
 .dialog {
   --md-dialog-container-shape: 10px;
-  --md-dialog-container-color:#eff1f3;
+  --md-dialog-container-color:var(--md-sys-color-inverse-on-surface-light);
 }
 
 /* loading */
@@ -89,10 +89,11 @@
 .response-card {
   display: flex;
   align-items: center;
-  border: 1px solid #d1d1d1;
+  border: 1px solid var(--md-sys-color-surface-variant-light);
   border-radius: 12px;
   padding: 1rem;
-  margin-top: 0rem
+  margin-top: 0rem;
+  max-width: 840px;
 }
 
 .response-card .icon {
@@ -106,8 +107,3 @@
 .response-card .negative {
   color: var(--md-sys-color-error-light);
 }
-
-
-
-
-

@@ -30,17 +30,11 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
  */
 export interface Record {
     /**
-     * Unique identifier of PN record
+     * Unique identifier of PN record.
      * @type {string}
      * @memberof Record
      */
     'id': string;
-    /**
-     * Full name of pacient whom the PN record was issued
-     * @type {string}
-     * @memberof Record
-     */
-    'fullName'?: string;
     /**
      * Unique identifier of the patient - in slovakia its rodné číslo
      * @type {string}
@@ -48,48 +42,66 @@ export interface Record {
      */
     'patientId': string;
     /**
-     * Pacient\'s employer linked to the issued PN record
+     * Full name of pacient whom the PN record was issued. When creating or updating a PN record, this field is not required if patient (patient ID) already has existing PN records from which the fullname will be inherited. Other wise it needs to be specified. When you provide the Full Name there is a contrain that it needs to match full name of other patient\'s (patiend ID) Pn records to avoid conflicting names. This is not the case if you update the full name of the only record the patient has.
+     * @type {string}
+     * @memberof Record
+     */
+    'fullName'?: string;
+    /**
+     * Pacient\'s employer linked to the issued PN record.
      * @type {string}
      * @memberof Record
      */
     'employer': string;
     /**
-     * Reason/couse why the PN was issued for the pacient
+     * Reason/couse why the PN was issued for the pacient. From the official ePN in Slovakia it can have only six possible string values. This values are validated.
      * @type {string}
      * @memberof Record
      */
-    'reason': string;
+    'reason': RecordReasonEnum;
     /**
-     * Date when the PN record was created (issued)
+     * Date when the PN record was created (issued). It need to have format dd-mm-yyyy in range between 0001-01-02 and 9999-12-31. This format and range are validated.
      * @type {string}
      * @memberof Record
      */
     'issued': string;
     /**
-     * Date since the issued PN record is valid
+     * Date since the issued PN record is valid. On this date validity of record start. It need to have format dd-mm-yyyy in range between 0001-01-02 and 9999-12-31. If patient already have some existing PN records this date needs to be at least day after \'valid until\' date of patient\'s latest record in terms of validity. Eg. existing latest record in terms of validity (Valid Until) ends on 10/02 so new PN record validity need to start at least on 11/02. Other constrain is that this field cannot be updated if its not the latest record in terms of validity for such patient ID. This constrains, range and format of this date are validated.
      * @type {string}
      * @memberof Record
      */
     'validFrom': string;
     /**
-     * Date when the issued PN record validity ends (expires)
+     * Date when the issued PN record validity ends (expires). On this date validity of record ends. It need to have format dd-mm-yyyy in range between 0001-01-02 and 9999-12-31. PN record can be issued for at least 1 day so this date need to be on \'Valid from\' day or later. This field cannot be updated if its not the latest record in terms of validity for such patient ID. This constrains are validated along with format and range.
      * @type {string}
      * @memberof Record
      */
     'validUntil': string;
     /**
-     * Date when the check up associated with PN record is planned
+     * Date when the check up associated with PN record is planned. It need to have format dd-mm-yyyy in range between 0001-01-02 and 9999-12-31. Checkup date need to be on day of \'Valid from\' or later. This is validated with format and range. Omit this field if you dont want to specify it.
      * @type {string}
      * @memberof Record
      */
     'checkUp'?: string;
     /**
-     * If the check up associated with PN record was done
+     * If the check up associated with PN record was done. If this field is not provided then it created as \'false\' at default.
      * @type {boolean}
      * @memberof Record
      */
     'checkUpDone'?: boolean;
 }
+
+export const RecordReasonEnum = {
+    Choroba: 'choroba',
+    Uraz: 'uraz',
+    ChorobaZPovolania: 'choroba z povolania',
+    KarantenneOpatrenieIzolacia: 'karantenne opatrenie/izolacia',
+    PracovnyUraz: 'pracovny uraz',
+    Ine: 'ine'
+} as const;
+
+export type RecordReasonEnum = typeof RecordReasonEnum[keyof typeof RecordReasonEnum];
+
 
 /**
  * PnRegistryRecordsApi - axios parameter creator
@@ -134,9 +146,9 @@ export const PnRegistryRecordsApiAxiosParamCreator = function (configuration?: C
             };
         },
         /**
-         * Use this method to delete the specific PN record from list of all PN record in the system.
+         * Deletes the specific PN record (based on record ID) from list of all PN records in the system.
          * @summary Deletes specific PN record
-         * @param {string} recordId pass the id of the particular PN record
+         * @param {string} recordId pass the ID of the particular PN record
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -168,9 +180,9 @@ export const PnRegistryRecordsApiAxiosParamCreator = function (configuration?: C
             };
         },
         /**
-         * By specifying recordId and entryId you can get details of particular PN record.
+         * Based on provided record ID you can get details of particular PN record.
          * @summary Provides details about specific PN record
-         * @param {string} recordId pass the id of the particular PN record
+         * @param {string} recordId Pass the id of the particular PN record
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -233,8 +245,8 @@ export const PnRegistryRecordsApiAxiosParamCreator = function (configuration?: C
         },
         /**
          * Use this method to update content of specific PN record.
-         * @summary Updates specific PN record
-         * @param {string} recordId pass the id of the particular PN record
+         * @summary Updates fields of specific PN record
+         * @param {string} recordId Pass the ID of the particular PN record
          * @param {Record} record Waiting list entry to update
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -293,9 +305,9 @@ export const PnRegistryRecordsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Use this method to delete the specific PN record from list of all PN record in the system.
+         * Deletes the specific PN record (based on record ID) from list of all PN records in the system.
          * @summary Deletes specific PN record
-         * @param {string} recordId pass the id of the particular PN record
+         * @param {string} recordId pass the ID of the particular PN record
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -304,9 +316,9 @@ export const PnRegistryRecordsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * By specifying recordId and entryId you can get details of particular PN record.
+         * Based on provided record ID you can get details of particular PN record.
          * @summary Provides details about specific PN record
-         * @param {string} recordId pass the id of the particular PN record
+         * @param {string} recordId Pass the id of the particular PN record
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -326,8 +338,8 @@ export const PnRegistryRecordsApiFp = function(configuration?: Configuration) {
         },
         /**
          * Use this method to update content of specific PN record.
-         * @summary Updates specific PN record
-         * @param {string} recordId pass the id of the particular PN record
+         * @summary Updates fields of specific PN record
+         * @param {string} recordId Pass the ID of the particular PN record
          * @param {Record} record Waiting list entry to update
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -357,9 +369,9 @@ export const PnRegistryRecordsApiFactory = function (configuration?: Configurati
             return localVarFp.createRecord(record, options).then((request) => request(axios, basePath));
         },
         /**
-         * Use this method to delete the specific PN record from list of all PN record in the system.
+         * Deletes the specific PN record (based on record ID) from list of all PN records in the system.
          * @summary Deletes specific PN record
-         * @param {string} recordId pass the id of the particular PN record
+         * @param {string} recordId pass the ID of the particular PN record
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -367,9 +379,9 @@ export const PnRegistryRecordsApiFactory = function (configuration?: Configurati
             return localVarFp.deleteRecord(recordId, options).then((request) => request(axios, basePath));
         },
         /**
-         * By specifying recordId and entryId you can get details of particular PN record.
+         * Based on provided record ID you can get details of particular PN record.
          * @summary Provides details about specific PN record
-         * @param {string} recordId pass the id of the particular PN record
+         * @param {string} recordId Pass the id of the particular PN record
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -387,8 +399,8 @@ export const PnRegistryRecordsApiFactory = function (configuration?: Configurati
         },
         /**
          * Use this method to update content of specific PN record.
-         * @summary Updates specific PN record
-         * @param {string} recordId pass the id of the particular PN record
+         * @summary Updates fields of specific PN record
+         * @param {string} recordId Pass the ID of the particular PN record
          * @param {Record} record Waiting list entry to update
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -416,9 +428,9 @@ export interface PnRegistryRecordsApiInterface {
     createRecord(record: Record, options?: AxiosRequestConfig): AxiosPromise<Record>;
 
     /**
-     * Use this method to delete the specific PN record from list of all PN record in the system.
+     * Deletes the specific PN record (based on record ID) from list of all PN records in the system.
      * @summary Deletes specific PN record
-     * @param {string} recordId pass the id of the particular PN record
+     * @param {string} recordId pass the ID of the particular PN record
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PnRegistryRecordsApiInterface
@@ -426,9 +438,9 @@ export interface PnRegistryRecordsApiInterface {
     deleteRecord(recordId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
-     * By specifying recordId and entryId you can get details of particular PN record.
+     * Based on provided record ID you can get details of particular PN record.
      * @summary Provides details about specific PN record
-     * @param {string} recordId pass the id of the particular PN record
+     * @param {string} recordId Pass the id of the particular PN record
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PnRegistryRecordsApiInterface
@@ -446,8 +458,8 @@ export interface PnRegistryRecordsApiInterface {
 
     /**
      * Use this method to update content of specific PN record.
-     * @summary Updates specific PN record
-     * @param {string} recordId pass the id of the particular PN record
+     * @summary Updates fields of specific PN record
+     * @param {string} recordId Pass the ID of the particular PN record
      * @param {Record} record Waiting list entry to update
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -477,9 +489,9 @@ export class PnRegistryRecordsApi extends BaseAPI implements PnRegistryRecordsAp
     }
 
     /**
-     * Use this method to delete the specific PN record from list of all PN record in the system.
+     * Deletes the specific PN record (based on record ID) from list of all PN records in the system.
      * @summary Deletes specific PN record
-     * @param {string} recordId pass the id of the particular PN record
+     * @param {string} recordId pass the ID of the particular PN record
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PnRegistryRecordsApi
@@ -489,9 +501,9 @@ export class PnRegistryRecordsApi extends BaseAPI implements PnRegistryRecordsAp
     }
 
     /**
-     * By specifying recordId and entryId you can get details of particular PN record.
+     * Based on provided record ID you can get details of particular PN record.
      * @summary Provides details about specific PN record
-     * @param {string} recordId pass the id of the particular PN record
+     * @param {string} recordId Pass the id of the particular PN record
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PnRegistryRecordsApi
@@ -513,8 +525,8 @@ export class PnRegistryRecordsApi extends BaseAPI implements PnRegistryRecordsAp
 
     /**
      * Use this method to update content of specific PN record.
-     * @summary Updates specific PN record
-     * @param {string} recordId pass the id of the particular PN record
+     * @summary Updates fields of specific PN record
+     * @param {string} recordId Pass the ID of the particular PN record
      * @param {Record} record Waiting list entry to update
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
