@@ -25,7 +25,6 @@ export class MbPnregistryApp {
       } else {
         this.relativePath = '';
       }
-      console.log('This is relative:', this.relativePath);
     };
 
     window.navigation?.addEventListener('navigate', (ev: Event) => {
@@ -46,7 +45,6 @@ export class MbPnregistryApp {
     if (this.relativePath.startsWith('record/')) {
       element = 'detail';
       recordId = this.relativePath.split('/')[1];
-      console.log('Record id:', recordId);
     }
 
     const navigate = (path: string) => {
